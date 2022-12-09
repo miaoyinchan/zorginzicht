@@ -13,6 +13,11 @@ from extract_info import extract_info, pdf_to_text, clean_text, tokenize
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 
+# TODO: create table invoice to save the extracted info.
+# TODO: create endpoint
+# TODO: integrate with frontend
+# TODO: create more invoices to test
+
 
 def get_db_conn():
     if "db" not in g:
@@ -73,7 +78,8 @@ def upload_file():
 
     filename = secure_filename(file.filename)
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return redirect(url_for('overview'))
+    # return redirect(url_for('overview'))
+    return {"status": "OK"}
 
 
 @app.get('/api/overview')
