@@ -7,6 +7,8 @@ from pathlib import Path
 from nltk.tokenize import word_tokenize
 from pprint import pprint
 
+# TODO: Ask customer_id from frontend url then save it in table Inovice.
+# TODO: get more invoices to test
 
 amount_keywords = ['totaal']
 health_care_providers_id = [{"12076154": "tandarts"}, {"24437187": "preventie"}]
@@ -95,12 +97,20 @@ def get_polis_number(tokens):
             return ("policy number", only_number(t2))
 
 
+def get_date(tokens):
+    for t1, t2 in zip_longest(tokens, tokens[1:]):
+        if t1.lower() == 'datum':
+            # print(t1, t2)
+            return ("invoice_date", t2)
+
+
 def extract_info(tokens):
     final_res = set()
     final_res.add(get_invoice_nr(tokens))
     final_res.add(get_polis_number(tokens))
     final_res.add(get_caretype(tokens))
     final_res.add(get_amount(tokens))
+    final_res.add(get_date(tokens))
 
    # Check if all needed info is available in invoice for extracting
     extracted_info_names = []
@@ -139,6 +149,7 @@ def extract_info(tokens):
 #             text = pdf_to_text(p)
 #             new_lines = clean_text(text)
 #             tokens = tokenize(new_lines)
+#             print(tokens)
 #             results.append(extract_info(tokens))
 
 #     if results:
