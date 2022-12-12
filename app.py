@@ -1,28 +1,26 @@
 import os
 from pathlib import Path
 from contextlib import contextmanager
-from peewee import (
-    MySQLDatabase, Model, BigIntegerField,
-    DecimalField, CharField, DateField
-)
+from datetime import datetime
 
 import pymysql
 import pymysql.cursors
-from flask import Flask, flash, request, redirect, url_for, render_template, g, jsonify
+from flask import Flask, flash, request, redirect, url_for, g, jsonify
 from werkzeug.utils import secure_filename
+from peewee import (
+    MySQLDatabase, Model, BigIntegerField,
+    DecimalField, CharField, DateField, IntegerField
+)
+from playhouse.shortcuts import model_to_dict
 
 from extract_info import extract_info, pdf_to_text, clean_text, tokenize
 
 # DONE: connect with database server.
 # DONE: create table Invoice.
-# TODO: save the extracted info to table Invoice.
-# TODO: create endpoint for table invoice.
-
-# TODO: endpoint for extracted info
-# TODO:
-# [x] endpoint for uploading pdf.
-# [ ] extract data from uploaded PDF
-# [ ] insert extracted data in database
+# DONE: create endpoint of uploading invoice (pdf) per customer.
+# DONE: extract info from uploaded invoice.
+# DONE: save the extracted info to table Invoice.
+# DONE: create endpoint for getting invoice per customer.
 
 
 DATABASE = 'zorginzichtPython'
@@ -59,11 +57,13 @@ class Invoice(BaseModel):
     # invoice_date(date)
     # amount (decimal)
     # caretype (varchar)
-    id = AutoBigIntegerField(primary_key=True)
-    customer_id = BigIntegerField(unique=True)
+    # invoice_nr (int)
+    # id = AutoBigIntegerField(primary_key=True)
+    customer_id = BigIntegerField() # One customer can upload more than 1 invoice.
     invoice_date = DateField()
     amount = DecimalField()
     caretype = CharField()
+    invoice_nr = IntegerField()
 
 
 # Custom command to create table initially.
@@ -90,59 +90,59 @@ def after_request(response):
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # Endpoint of uploading pdf, it deals with POST request from frontend
-@app.post('/upload_file')
-def upload_file():
-    url = url_for("overview")
+# Test with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/2342
+@app.post('/upload_file/<int:customer_id>')
+def upload_file(customer_id):
 
     # Check if the post request has the file part
     if 'file' not in request.files:
-        flash('No file part')
-        return redirect(url)
+        return {"status": "error", "message": "no file in request"}
+
     file = request.files['file']
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
-    if file.filename in ('', None):
-        flash('No selected file')
-        return redirect(url)
+
+    if not file or not file.filename:
+        return {"status": "error", "message": "no file"}
     if file and not allowed_file(file.filename):
-        flash('File not allowed')
-        return redirect(url)
+        return {"status": "error", "message": "file now allowed"}
 
     filename = secure_filename(file.filename)
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    # return redirect(url_for('overview'))
+    filepath = Path(app.config['UPLOAD_FOLDER']) / filename
+    file.save(filepath)
+
+    text = pdf_to_text(filepath)
+    new_lines = clean_text(text)
+    tokens = tokenize(new_lines)
+    results = extract_info(tokens)
+    print(results)
+
+    # Save the extracted info in database (table Invoice).
+    # FIXED: extract_info does not have consistent results! Query fails!
+    fallback_invoice_date = datetime.now().date()
+    Invoice.create(
+        customer_id=customer_id,
+        invoice_date=results.get('invoice_date', fallback_invoice_date),
+        amount=results.get('amount'),
+        caretype=results.get('caretype'),
+        invoice_nr=results.get('invoice_nr'),
+    )
+
     return {"status": "OK"}
 
 
-# Endpoint of extracted info. of invoice
-@app.get('/api/get_extracted_info')
-def api_get_extracted_info():
-    results = get_extracted_info()
-    return jsonify(results)
-
-
-@app.get('/overview')
-def overview():
-    results = get_extracted_info()
-    return render_template("overview.html", invoices=results)
-
-
-def get_extracted_info():
-    dir = os.listdir(UPLOAD_FOLDER)
-    results = []
-
-    if len(dir) == 0:
-        print("There is no file uploaded.")
-    else:
-        for p in Path(UPLOAD_FOLDER).glob("*.pdf"):
-            # print(p)
-            text = pdf_to_text(p)
-            new_lines = clean_text(text)
-            tokens = tokenize(new_lines)
-            results.append(extract_info(tokens))
-
-    return results
+# Test with: curl -v http://localhost:5000/api/invoices/2342
+# Endpoint for getting invoice per customer.
+@app.get("/api/invoices/<int:customer_id>")
+def get_invoices(customer_id):
+    return {
+        "status": "OK",
+        "results": [
+            model_to_dict(invoice)
+            for invoice in Invoice
+                .select()
+                .where(Invoice.customer_id == customer_id)
+        ],
+    }

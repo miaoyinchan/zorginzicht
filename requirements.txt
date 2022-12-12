@@ -1,3 +1,4 @@
 flask
 nltk
 PyPDF2
+peewee

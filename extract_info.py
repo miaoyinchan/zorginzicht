@@ -7,7 +7,7 @@ from pathlib import Path
 from nltk.tokenize import word_tokenize
 from pprint import pprint
 
-# TODO: Ask customer_id from frontend url then save it in table Inovice.
+
 # TODO: get more invoices to test
 
 amount_keywords = ['totaal']
@@ -19,13 +19,13 @@ info_names = ['amount', 'caretype', 'polis number', 'invoice number']
 
 
 def pdf_to_text(pdffile):
-    pdffileobj=open(pdffile,'rb')
-    pdfreader=PyPDF2.PdfFileReader(pdffileobj)
-    x=pdfreader.numPages
-    text = ""
-    for i in range(x):
-        pageobj = pdfreader.getPage(i)
-        text += pageobj.extractText()
+    with open(pdffile, "rb") as fd:
+        pdfreader=PyPDF2.PdfFileReader(fd)
+        x=pdfreader.numPages
+        text = ""
+        for i in range(x):
+            pageobj = pdfreader.getPage(i)
+            text += pageobj.extractText()
     # print(text)
     return text
 
@@ -69,7 +69,7 @@ def get_invoice_nr(tokens):
     for t1, t2 in zip_longest(tokens, tokens[1:]):
         # print("t1: ", t1)
         if t1.lower() in invoice_keywords:
-            return ("invoice number", only_number(t2))
+            return ("invoice_nr", only_number(t2))
 
 
 def get_amount(tokens):
@@ -94,7 +94,7 @@ def get_polis_number(tokens):
     for t1, t2 in zip_longest(tokens, tokens[1:]):
         if t1.lower() in polis_keywords and has_numbers(t2) == True:
             # print(t1, t2)
-            return ("policy number", only_number(t2))
+            return ("policy_nr", only_number(t2))
 
 
 def get_date(tokens):
@@ -112,7 +112,7 @@ def extract_info(tokens):
     final_res.add(get_amount(tokens))
     final_res.add(get_date(tokens))
 
-   # Check if all needed info is available in invoice for extracting
+    # Check if all needed info is available in invoice for extracting
     extracted_info_names = []
     for r in final_res:
         if r != None:

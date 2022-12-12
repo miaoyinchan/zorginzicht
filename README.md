@@ -1,6 +1,8 @@
-# zorginzicht
+# zorginzichtPython
 To run this app, following these steps:
-1. start xampp: sudo /opt/lampp/xampp start
-2. create a database named "zorginzicht" (do not need to creat table yet).
-3. run app" flask --app app --debug run
-4. open in browser: http://127.0.0.1:5000/overview
+1. Start xampp: sudo /opt/lampp/xampp start
+2. Create a database named "zorginzichtPython" (do not need to creat any table)
+3. Create table invoice initially: flask --debug create-tables
+4. Run app.py: flask --debug run
+5. Upload an invoice and save it in database: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/2342
+6. Ask invoic per customer: curl http://localhost:5000/api/invoices/2342
