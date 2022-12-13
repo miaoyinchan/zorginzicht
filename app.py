@@ -8,7 +8,7 @@ import pymysql.cursors
 from flask import Flask, flash, request, redirect, url_for, g, jsonify
 from werkzeug.utils import secure_filename
 from peewee import (
-    MySQLDatabase, Model, BigIntegerField,
+    MySQLDatabase, Model, BigIntegerField, fn,
     DecimalField, CharField, DateField, IntegerField
 )
 from playhouse.shortcuts import model_to_dict
@@ -21,6 +21,8 @@ from extract_info import extract_info, pdf_to_text, clean_text, tokenize
 # DONE: extract info from uploaded invoice.
 # DONE: save the extracted info to table Invoice.
 # DONE: create endpoint for getting invoice per customer.
+# DONE: sum up amount per caretype per customer.
+# DONE: create endpoint for getting sum per caretype per customer.
 
 
 DATABASE = 'zorginzichtPython'
@@ -144,5 +146,22 @@ def get_invoices(customer_id):
             for invoice in Invoice
                 .select()
                 .where(Invoice.customer_id == customer_id)
+        ],
+    }
+
+
+# Test with: curl -v http://localhost:5000/api/sum_per_caretype/2342
+# Endpoint for getting sum per caretype per customer.
+@app.get("/api/sum_per_caretype/<int:customer_id>")
+def get_sum_per_caretype(customer_id):
+    invoices = Invoice.select(
+        Invoice.caretype, fn.SUM(Invoice.amount).alias("sum")
+    ).where(Invoice.customer_id == customer_id).group_by(Invoice.caretype)
+    print()
+    return {
+        "status": "OK",
+        "results": [
+            {"caretype": invoice.caretype, "total": invoice.sum}
+            for invoice in invoices
         ],
     }
