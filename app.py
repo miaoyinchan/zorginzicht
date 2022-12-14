@@ -96,7 +96,7 @@ def allowed_file(filename):
 
 
 # Endpoint of uploading pdf, it deals with POST request from frontend
-# Test with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/2342
+# Test with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/1
 @app.post('/upload_file/<int:customer_id>')
 def upload_file(customer_id):
     # Check if the post request has the file part
@@ -136,7 +136,7 @@ def upload_file(customer_id):
     return {"status": "OK"}
 
 
-# Test with: curl -v http://localhost:5000/api/invoices/2342
+# Test with: curl -v http://localhost:5000/api/invoices/1
 # Endpoint for getting invoice per customer.
 @app.get("/api/invoices/<int:customer_id>")
 def get_invoices(customer_id):
@@ -151,7 +151,7 @@ def get_invoices(customer_id):
     }
 
 
-# Test with: curl -v http://localhost:5000/api/sum_per_caretype/2342
+# Test with: curl -v http://localhost:5000/api/sum_per_caretype/1
 # Endpoint for getting sum per caretype per customer.
 @app.get("/api/sum_per_caretype/<int:customer_id>")
 def get_sum_per_caretype(customer_id):

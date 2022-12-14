@@ -10,7 +10,7 @@ const handleSubmit = (event) => {
         formData.append("files", file);
     }
 
-    fetch("http://localhost:5000/upload_file/2342", {
+    fetch("http://localhost:5000/upload_file/1", {
         method: "post",
         body: formData,
     })

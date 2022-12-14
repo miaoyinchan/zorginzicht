@@ -1,16 +1,28 @@
+from pprint import pprint
+
 import requests
 
 
-# TODO: get total usage of each care type from invoice table (DB2)
-# TODO: get current_insurance (name and coverage) from policy table (DB1)
-# TODO: get available insurance (name, coverage, cost) from insurance table (DB1)
+# DONE: get total usage of each care type from invoice table (DB2)
+# DONE: get current_insurance (name and coverage) from policy table (DB1)
 
+# TODO: input the data to main function (suggest)
 # TODO: create an endpoint for frontend
 # TODO: write test cases to guarantee 100% coverage
 
 
-def get_sum_per_caretyp_from_api(customer_id):
-    r = requests.get(f"http://localhost:5008/api/Policies/{customer_id}")
+def get_sum_per_caretype_from_api(customer_id):
+    response = requests.get(f"http://localhost:5000/api/sum_per_caretype/{customer_id}")
+    if response.status_code != 200:
+        raise ValueError(response.text)
+    return response.json()
+
+
+def get_insurance_coverage_from_api(customer_id):
+    response =  requests.get(f"http://localhost:5008/api/Customers/{customer_id}")
+    if response.status_code != 200:
+        raise ValueError(response.text)
+    return response.json()
 
 
 def suggest(usage, coverage, current_insurance, available_insurances):
@@ -31,12 +43,20 @@ def suggest(usage, coverage, current_insurance, available_insurances):
 
 
 def main():
+
+    cid = 1
+    pprint(get_sum_per_caretype_from_api(cid))
+    pprint(get_insurance_coverage_from_api(cid))
+
+
+    return
+
     available_insurances = [
         {"name": "tand1", "coverage": 250, "cost": 10},
         {"name": "tand2", "coverage": 500, "cost": 20},
         {"name": "tand3", "coverage": 750, "cost": 30},
-        {"name": "fysio1", "coverage": 750, "cost": 30},
-        {"name": "fysio2", "coverage": 750, "cost": 30},
+        {"name": "fysio1", "coverage": 250, "cost": 10},
+        {"name": "fysio2", "coverage": 500, "cost": 20},
         {"name": "fysio3", "coverage": 750, "cost": 30},
     ]
 
