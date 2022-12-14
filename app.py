@@ -99,38 +99,39 @@ def allowed_file(filename):
 # Test with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/2342
 @app.post('/upload_file/<int:customer_id>')
 def upload_file(customer_id):
-
     # Check if the post request has the file part
-    if 'file' not in request.files:
-        return {"status": "error", "message": "no file in request"}
+    if 'files' not in request.files:
+        return {"status": "error", "message": "no file(s) in request"}
 
-    file = request.files['file']
+    for file in request.files.getlist("files"):
+        if not file or not file.filename:
+            return {"status": "error", "message": "no file"}
+        if file and not allowed_file(file.filename):
+            return {"status": "error", "message": "file now allowed"}
 
-    if not file or not file.filename:
-        return {"status": "error", "message": "no file"}
-    if file and not allowed_file(file.filename):
-        return {"status": "error", "message": "file now allowed"}
+        filename = secure_filename(file.filename)
+        filepath = Path(app.config['UPLOAD_FOLDER']) / filename
+        file.save(filepath)
 
-    filename = secure_filename(file.filename)
-    filepath = Path(app.config['UPLOAD_FOLDER']) / filename
-    file.save(filepath)
+        text = pdf_to_text(filepath)
+        new_lines = clean_text(text)
+        tokens = tokenize(new_lines)
+        results = extract_info(tokens)
+        print(results)
 
-    text = pdf_to_text(filepath)
-    new_lines = clean_text(text)
-    tokens = tokenize(new_lines)
-    results = extract_info(tokens)
-    print(results)
-
-    # Save the extracted info in database (table Invoice).
-    # FIXED: extract_info does not have consistent results! Query fails!
-    fallback_invoice_date = datetime.now().date()
-    Invoice.create(
-        customer_id=customer_id,
-        invoice_date=results.get('invoice_date', fallback_invoice_date),
-        amount=results.get('amount'),
-        caretype=results.get('caretype'),
-        invoice_nr=results.get('invoice_nr'),
-    )
+        # Save the extracted info in database (table Invoice).
+        # FIXED: extract_info does not have consistent results! Query fails!
+        fallback_invoice_date = datetime.now().date()
+        # print(filepath)
+        # print(results)
+        # print("__________")
+        Invoice.create(
+            customer_id=customer_id,
+            invoice_date=results.get('invoice_date', fallback_invoice_date),
+            amount=results.get('amount'),
+            caretype=results.get('caretype'),
+            invoice_nr=results.get('invoice_nr'),
+        )
 
     return {"status": "OK"}
 
