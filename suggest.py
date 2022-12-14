@@ -1,9 +1,16 @@
+import requests
+
+
 # TODO: get total usage of each care type from invoice table (DB2)
 # TODO: get current_insurance (name and coverage) from policy table (DB1)
 # TODO: get available insurance (name, coverage, cost) from insurance table (DB1)
 
 # TODO: create an endpoint for frontend
 # TODO: write test cases to guarantee 100% coverage
+
+
+def get_sum_per_caretyp_from_api(customer_id):
+    r = requests.get(f"http://localhost:5008/api/Policies/{customer_id}")
 
 
 def suggest(usage, coverage, current_insurance, available_insurances):

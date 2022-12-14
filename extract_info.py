@@ -8,10 +8,11 @@ from nltk.tokenize import word_tokenize
 from pprint import pprint
 
 
-# TODO: get more invoices to test
+# DONE: get more invoices to test
 
 amount_keywords = ['totaal']
-health_care_providers_id = [{"12076154": "tandarts"}, {"24437187": "preventie"}]
+# health_care_providers_id = [{"12076154": "tandarts"}, {"24437187": "preventie"}]
+health_care_keywords = ["tandarts", "fysiotherapie"]
 polis_keywords = ['polisnummer']
 invoice_keywords = ['factuurnummer']
 rubbish_words = [':', 'incl', 'excl', 'btw', '-', '.', '•', '€']
@@ -84,10 +85,9 @@ def get_amount(tokens):
 
 def get_caretype(tokens):
     for t in tokens:
-        for values in health_care_providers_id:
-            value = values.get(t)
-            if value:
-                return ("caretype", value)
+        for k in health_care_keywords:
+            if t.lower() == k:
+                return ("caretype", k)
 
 
 def get_polis_number(tokens):
@@ -138,7 +138,7 @@ def extract_info(tokens):
 
 
 # def main():
-#     UPLOAD_FOLDER = './uploads'
+#     UPLOAD_FOLDER = './testdata'
 #     dir = os.listdir(UPLOAD_FOLDER)
 #     results = []
 #     if len(dir) == 0:
