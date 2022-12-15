@@ -15,14 +15,37 @@ def get_sum_per_caretype_from_api(customer_id):
     response = requests.get(f"http://localhost:5000/api/sum_per_caretype/{customer_id}")
     if response.status_code != 200:
         raise ValueError(response.text)
-    return response.json()
+    data = response.json()
+    results = []
+    for e in data.get('results'):
+        results.append(e)
+
+    if len(results) < 2:
+        results.append({'caretype': 'none', 'total': 'none'})
+
+    return results
 
 
 def get_insurance_coverage_from_api(customer_id):
     response =  requests.get(f"https://zi-webapp.azurewebsites.net/api/Customers/{customer_id}")
     if response.status_code != 200:
         raise ValueError(response.text)
-    return response.json()
+    data = response.json()
+    results = []
+    insurance_name = (data.get('policies')[0]
+               .get('additional_insurances')[0]
+               .get('name')
+    )
+    coverage = (data.get('policies')[0]
+               .get('additional_insurances')[0]
+               .get('max_coverage')
+    )
+    results.append({"insurance_name": insurance_name, "coverage": coverage})
+
+    if len(results) < 2:
+        results.append({"insurance_name": "none", "coverage": "none"})
+
+    return results
 
 
 def suggest(usage, coverage, current_insurance, available_insurances):
@@ -42,13 +65,27 @@ def suggest(usage, coverage, current_insurance, available_insurances):
     return "Please contact us for advices."
 
 
+def create_suggestion(customer_id):
+    available_insurances = [
+        {"name": "Tand 1", "coverage": 250, "cost": 10},
+        {"name": "Tand 2", "coverage": 500, "cost": 20},
+        {"name": "Tand 3", "coverage": 750, "cost": 30},
+        {"name": "Fysiotherapie 1", "coverage": 250, "cost": 10},
+        {"name": "Fysiotherapie 2", "coverage": 500, "cost": 20},
+        {"name": "Fysiotherapie 3", "coverage": 750, "cost": 30},
+    ]
+    invoice_data = get_sum_per_caretype_from_api(customer_id)
+    insurance_data = get_insurance_coverage_from_api(customer_id)
+    for e in invoice_data:
+
+
+
 def main():
 
     cid = 1
     pprint(get_sum_per_caretype_from_api(cid))
     pprint(get_insurance_coverage_from_api(cid))
-
-
+    print('---------')
     return
 
     available_insurances = [
