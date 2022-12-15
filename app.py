@@ -26,7 +26,7 @@ from extract_info import extract_info, pdf_to_text, clean_text, tokenize
 # DONE: create endpoint for getting sum per caretype per customer.
 
 
-DATABASE = 'zorginzichtPython'
+
 DEBUG = True
 
 UPLOAD_FOLDER = './uploads'
@@ -38,9 +38,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # create a peewee database instance -- our models will use this database to
 # persist information.
 mysql_db = MySQLDatabase(
-    DATABASE,
-    user="root",
-    field_types={'auto_bigint': 'BIGINT AUTO_INCREMENT'},
+    host='pythonnovember.mysql.database.azure.com',
+    user='antran',
+    password='abcd1234ABCD!@#$',
+    database='zorginzichtpython'
 )
 
 
