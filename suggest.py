@@ -12,7 +12,7 @@ import requests
 
 
 def get_sum_per_caretype_from_api(customer_id):
-    response = requests.get(f"http://localhost:5000/api/sum_per_caretype/{customer_id}")
+    response = requests.get(f"https://zorginzicht4.azurewebsites.net/api/sum_per_caretype/{customer_id}")
     if response.status_code != 200:
         raise ValueError(response.text)
     data = response.json()
@@ -21,7 +21,7 @@ def get_sum_per_caretype_from_api(customer_id):
         results.append(e)
 
     if len(results) < 2:
-        results.append({'caretype': 'none', 'total': 'none'})
+        results.append({'caretype': 'none', 'total': 0.0})
 
     return results
 
@@ -40,10 +40,10 @@ def get_insurance_coverage_from_api(customer_id):
                .get('additional_insurances')[0]
                .get('max_coverage')
     )
-    results.append({"insurance_name": insurance_name, "coverage": coverage})
+    results.append({"insurance_name": insurance_name.lower(), "coverage": coverage})
 
     if len(results) < 2:
-        results.append({"insurance_name": "none", "coverage": "none"})
+        results.append({"insurance_name": "none", "coverage": 0.0})
 
     return results
 
@@ -55,6 +55,8 @@ def suggest(usage, coverage, current_insurance, available_insurances):
     if not usage and coverage:
         return f"Maybe you don't need {current_insurance}."
 
+    # print("usage   ", type(usage))
+    # print("coverage", type(coverage))
     if usage <= coverage:
         return f"keep using {current_insurance}"
 
@@ -67,17 +69,28 @@ def suggest(usage, coverage, current_insurance, available_insurances):
 
 def create_suggestion(customer_id):
     available_insurances = [
-        {"name": "Tand 1", "coverage": 250, "cost": 10},
-        {"name": "Tand 2", "coverage": 500, "cost": 20},
-        {"name": "Tand 3", "coverage": 750, "cost": 30},
-        {"name": "Fysiotherapie 1", "coverage": 250, "cost": 10},
-        {"name": "Fysiotherapie 2", "coverage": 500, "cost": 20},
-        {"name": "Fysiotherapie 3", "coverage": 750, "cost": 30},
+        {"name": "Tand 1", "coverage": 250.0, "cost": 10.0},
+        {"name": "Tand 2", "coverage": 500.0, "cost": 20.0},
+        {"name": "Tand 3", "coverage": 750.0, "cost": 30.0},
+        {"name": "Fysiotherapie 1", "coverage": 250.0, "cost": 10.0},
+        {"name": "Fysiotherapie 2", "coverage": 500.0, "cost": 20.0},
+        {"name": "Fysiotherapie 3", "coverage": 750.0, "cost": 30.0},
     ]
     invoice_data = get_sum_per_caretype_from_api(customer_id)
     insurance_data = get_insurance_coverage_from_api(customer_id)
-    for e in invoice_data:
+    suggestion = []
+    for e, l in zip(invoice_data, insurance_data):
+        print("e", e)
+        print("l", l)
+        usage = float(e.get('total'))
+        coverage = l.get('coverage')
+        current_insurance = l.get('insurance_name')
+        suggestion.append(suggest(
+            usage, coverage, current_insurance, available_insurances)
+        )
+        print("DEBUG", suggestion)
 
+    return suggestion
 
 
 def main():
@@ -86,6 +99,7 @@ def main():
     pprint(get_sum_per_caretype_from_api(cid))
     pprint(get_insurance_coverage_from_api(cid))
     print('---------')
+    pprint(create_suggestion(cid))
     return
 
     available_insurances = [
