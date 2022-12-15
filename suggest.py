@@ -19,7 +19,7 @@ def get_sum_per_caretype_from_api(customer_id):
 
 
 def get_insurance_coverage_from_api(customer_id):
-    response =  requests.get(f"http://localhost:5008/api/Customers/{customer_id}")
+    response =  requests.get(f"https://zi-webapp.azurewebsites.net/api/Customers/{customer_id}")
     if response.status_code != 200:
         raise ValueError(response.text)
     return response.json()

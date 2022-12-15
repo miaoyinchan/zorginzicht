@@ -1,5 +1,6 @@
 import nltk
 import os
+import datetime
 import PyPDF2
 import re
 from itertools import zip_longest
@@ -100,8 +101,9 @@ def get_polis_number(tokens):
 def get_date(tokens):
     for t1, t2 in zip_longest(tokens, tokens[1:]):
         if t1.lower() == 'datum':
-            # print(t1, t2)
-            return ("invoice_date", t2)
+            t2 = t2.replace("-", "")
+            new_t2 = datetime.datetime.strptime(t2, "%d%m%Y").date()
+            return ("invoice_date", new_t2)
 
 
 def extract_info(tokens):
@@ -137,26 +139,26 @@ def extract_info(tokens):
     return final_final_final_res
 
 
-# def main():
-#     UPLOAD_FOLDER = './testdata'
-#     dir = os.listdir(UPLOAD_FOLDER)
-#     results = []
-#     if len(dir) == 0:
-#         print("There is no file uploaded.")
-#     else:
-#         for p in Path(UPLOAD_FOLDER).glob("*.pdf"):
-#             print(p)
-#             text = pdf_to_text(p)
-#             new_lines = clean_text(text)
-#             tokens = tokenize(new_lines)
-#             print(tokens)
-#             results.append(extract_info(tokens))
+def main():
+    UPLOAD_FOLDER = './testdata'
+    dir = os.listdir(UPLOAD_FOLDER)
+    results = []
+    if len(dir) == 0:
+        print("There is no file uploaded.")
+    else:
+        for p in Path(UPLOAD_FOLDER).glob("*.pdf"):
+            print(p)
+            text = pdf_to_text(p)
+            new_lines = clean_text(text)
+            tokens = tokenize(new_lines)
+            print(tokens)
+            results.append(extract_info(tokens))
 
-#     if results:
-#         pprint(results)
-#     else:
-#         print("It failed to crawl information from invoice.")
+    if results:
+        pprint(results)
+    else:
+        print("It failed to crawl information from invoice.")
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
