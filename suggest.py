@@ -103,12 +103,12 @@ def main():
     return
 
     available_insurances = [
-        {"name": "tand1", "coverage": 250, "cost": 10},
-        {"name": "tand2", "coverage": 500, "cost": 20},
-        {"name": "tand3", "coverage": 750, "cost": 30},
-        {"name": "fysio1", "coverage": 250, "cost": 10},
-        {"name": "fysio2", "coverage": 500, "cost": 20},
-        {"name": "fysio3", "coverage": 750, "cost": 30},
+        {"name": "Tand 1", "coverage": 250.0, "cost": 10.0},
+        {"name": "Tand 2", "coverage": 500.0, "cost": 20.0},
+        {"name": "Tand 3", "coverage": 750.0, "cost": 30.0},
+        {"name": "Fysiotherapie 1", "coverage": 250.0, "cost": 10.0},
+        {"name": "Fysiotherapie 2", "coverage": 500.0, "cost": 20.0},
+        {"name": "Fysiotherapie 3", "coverage": 750.0, "cost": 30.0},
     ]
 
     testcases = [
