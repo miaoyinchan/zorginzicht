@@ -87,9 +87,9 @@ def suggest(usage, coverage, current_insurance, available_insurances):
     return "Please contact us for advice."
 
 
-def create_suggestion(customer_id):
+def create_suggestion(customer_id, usages):
     available_insurances = get_additional_insurances_api()
-    usages = get_sum_per_caretype_from_api(customer_id)
+    # usages = get_sum_per_caretype_from_api(customer_id)
     coverages = get_insurance_coverage_from_api(customer_id)
 
     suggestions = []
