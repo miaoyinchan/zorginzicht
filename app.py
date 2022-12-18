@@ -163,7 +163,27 @@ def get_sum_per_caretype(customer_id):
 @app.get("/api/suggest/<int:customer_id>")
 @cross_origin(supports_credentials=True)
 def get_suggestions(customer_id):
+    invoices = Invoice.select(
+        Invoice.caretype, fn.SUM(Invoice.amount).alias("sum")
+    ).where(Invoice.customer_id == customer_id).group_by(Invoice.caretype)
+    data = [
+        {"caretype": invoice.caretype, "total": invoice.sum}
+        for invoice in invoices
+    ]
+    results = {}
+
+    for row in data:
+        key = CARE_TYPE_TO_INSURANCE_TYPE[row["caretype"]]
+        row["total"] = float(row["total"])
+        results[key] = row
+
     return {
         "status": "OK",
-        "results": create_suggestion(customer_id),
+        "results": create_suggestion(customer_id, results),
     }
+
+
+CARE_TYPE_TO_INSURANCE_TYPE = {
+    "tandarts": "Tand",
+    "fysiotherapie": "Fysio",
+}
