@@ -1,10 +1,6 @@
-import os
 from pathlib import Path
-from contextlib import contextmanager
 from datetime import datetime
 
-import pymysql
-import pymysql.cursors
 from flask_cors import CORS, cross_origin
 from flask import Flask, flash, request, redirect, url_for, g, jsonify
 from werkzeug.utils import secure_filename
@@ -15,20 +11,10 @@ from peewee import (
 from playhouse.shortcuts import model_to_dict
 
 from extract_info import extract_info, pdf_to_text, clean_text, tokenize
-
-# DONE: connect with database server.
-# DONE: create table Invoice.
-# DONE: create endpoint of uploading invoice (pdf) per customer.
-# DONE: extract info from uploaded invoice.
-# DONE: save the extracted info to table Invoice.
-# DONE: create endpoint for getting invoice per customer.
-# DONE: sum up amount per caretype per customer.
-# DONE: create endpoint for getting sum per caretype per customer.
-
+from suggest import create_suggestion
 
 
 DEBUG = True
-
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -98,7 +84,7 @@ def allowed_file(filename):
 
 
 # Endpoint of uploading pdf, it deals with POST request from frontend
-# Test with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/1
+# Tested with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/1
 @app.post('/upload_file/<int:customer_id>')
 @cross_origin(supports_credentials=True)
 def upload_file(customer_id):
@@ -139,7 +125,7 @@ def upload_file(customer_id):
     return {"status": "OK"}
 
 
-# Test with: curl -v http://localhost:5000/api/invoices/1
+# Tested with: curl -v http://localhost:5000/api/invoices/1
 # Endpoint for getting invoice per customer.
 @app.get("/api/invoices/<int:customer_id>")
 @cross_origin(supports_credentials=True)
@@ -155,7 +141,7 @@ def get_invoices(customer_id):
     }
 
 
-# Test with: curl -v http://localhost:5000/api/sum_per_caretype/1
+# Tested with: curl -v http://localhost:5000/api/sum_per_caretype/1
 # Endpoint for getting sum per caretype per customer.
 @app.get("/api/sum_per_caretype/<int:customer_id>")
 @cross_origin(supports_credentials=True)
@@ -163,11 +149,21 @@ def get_sum_per_caretype(customer_id):
     invoices = Invoice.select(
         Invoice.caretype, fn.SUM(Invoice.amount).alias("sum")
     ).where(Invoice.customer_id == customer_id).group_by(Invoice.caretype)
-    print()
     return {
         "status": "OK",
         "results": [
             {"caretype": invoice.caretype, "total": invoice.sum}
             for invoice in invoices
         ],
+    }
+
+
+# Tested with: curl -v http://localhost:5000/api/suggest/1
+# Endpoint for getting suggestion per customer.
+@app.get("/api/suggest/<int:customer_id>")
+@cross_origin(supports_credentials=True)
+def get_suggestions(customer_id):
+    return {
+        "status": "OK",
+        "results": create_suggestion(customer_id),
     }

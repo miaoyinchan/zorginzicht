@@ -9,10 +9,7 @@ from nltk.tokenize import word_tokenize
 from pprint import pprint
 
 
-# DONE: get more invoices to test
-
 amount_keywords = ['totaal']
-# health_care_providers_id = [{"12076154": "tandarts"}, {"24437187": "preventie"}]
 health_care_keywords = ["tandarts", "fysiotherapie"]
 polis_keywords = ['polisnummer']
 invoice_keywords = ['factuurnummer']
