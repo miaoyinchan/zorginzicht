@@ -4,3 +4,4 @@ PyPDF2
 peewee
 pymysql
 flask_cors
+requests
