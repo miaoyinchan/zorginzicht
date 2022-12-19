@@ -3,27 +3,27 @@ from pprint import pprint
 import requests
 
 
-CARE_TYPE_TO_INSURANCE_TYPE = {
-    "tandarts": "Tand",
-    "fysiotherapie": "Fysio",
-}
+# CARE_TYPE_TO_INSURANCE_TYPE = {
+#     "tandarts": "Tand",
+#     "fysiotherapie": "Fysio",
+# }
 
 
-def get_sum_per_caretype_from_api(customer_id):
-    response = requests.get(f"https://zorginzicht4.azurewebsites.net/api/sum_per_caretype/{customer_id}")
-    if response.status_code != 200:
-        raise ValueError(response.text)
+# def get_sum_per_caretype_from_api(customer_id):
+#     response = requests.get(f"https://pythonbk.azurewebsites.net/api/sum_per_caretype/{customer_id}")
+#     if response.status_code != 200:
+#         raise ValueError(response.text)
 
-    data = response.json().get("results", [])
+#     data = response.json().get("results", [])
 
-    results = {}
+#     results = {}
 
-    for row in data:
-        key = CARE_TYPE_TO_INSURANCE_TYPE[row["caretype"]]
-        row["total"] = float(row["total"])
-        results[key] = row
+#     for row in data:
+#         key = CARE_TYPE_TO_INSURANCE_TYPE[row["caretype"]]
+#         row["total"] = float(row["total"])
+#         results[key] = row
 
-    return results
+#     return results
 
 
 def get_additional_insurances_api():
@@ -114,7 +114,7 @@ def create_suggestion(customer_id, usages):
 def main():
 
     cid = 1
-    pprint(get_sum_per_caretype_from_api(cid))
+    # pprint(get_sum_per_caretype_from_api(cid))
     pprint(get_additional_insurances_api())
     pprint(get_insurance_coverage_from_api(cid))
     print('---------')

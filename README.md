@@ -22,13 +22,13 @@ To run this app, following these steps:
 
 # Endpoints:
 1. for getting invoices per customer:
-https://zorginzicht4.azurewebsites.net/api/invoices/<cid>
+https://pythonbk.azurewebsites.net/api/invoices/<cid>
 
 2. for getting sum caretype per customer:
-https://zorginzicht4.azurewebsites.net/api/sum_per_caretype/<cid>
+https://pythonbk.azurewebsites.net/api/sum_per_caretype/<cid>
 
 3. for getting suggestion per customer:
-https://zorginzicht4.azurewebsites.net/api/suggest/<cid>
+https://pythonbk.azurewebsites.net/api/suggest/<cid>
 
 4. for uploading pdf invoices per customer:
-https://zorginzicht4.azurewebsites.net/upload_file/<cid>
+https://pythonbk.azurewebsites.net/upload_file/<cid>
