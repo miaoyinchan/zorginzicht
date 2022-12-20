@@ -13,6 +13,9 @@ from playhouse.shortcuts import model_to_dict
 from extract_info import extract_info, pdf_to_text, clean_text, tokenize
 from suggest import create_suggestion
 
+import nltk
+nltk.download('punkt')
+
 
 DEBUG = True
 UPLOAD_FOLDER = './uploads'
