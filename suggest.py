@@ -68,13 +68,13 @@ def get_insurance_coverage_from_api(customer_id):
 
 def suggest(usage, coverage, current_insurance, available_insurances):
     if not usage and not coverage:
-        return "No suggestion."
+        return "Geen suggestie."
 
     if not usage and coverage:
-        return f"Maybe you don't need {current_insurance}."
+        return f"Misschien heeft u {current_insurance} niet nodig."
 
     if usage <= coverage:
-        return f"Please keep using {current_insurance}."
+        return f"U kunt het beste {current_insurance} blijven gebruiken."
 
     for insurance in available_insurances:
         if usage <= insurance["max_coverage"]:
@@ -84,7 +84,7 @@ def suggest(usage, coverage, current_insurance, available_insurances):
                 "price": insurance.get('costs'),
             }
 
-    return "Please contact us for advice."
+    return f"Neem a.u.b. contact op over de suggestie van {current_insurance}."
 
 
 def create_suggestion(customer_id, usages):
