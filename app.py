@@ -88,6 +88,7 @@ def allowed_file(filename):
 
 # Endpoint of uploading pdf, it deals with POST request from frontend
 # Tested with: curl -F 'file=@./testdata/3.pdf' http://localhost:5000/upload_file/1
+# curl -F 'files=@/home/an/Documents/private/youngcapital/traineeship/project/testdata/Factuur 1.pdf' https://pythonbk.azurewebsites.net/upload_file/2
 @app.post('/upload_file/<int:customer_id>')
 @cross_origin(supports_credentials=True)
 def upload_file(customer_id):
