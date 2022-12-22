@@ -110,6 +110,22 @@ def main():
             "usage": 751,
             "coverage": 500,
         }, # Please contact us for advice.
+        {
+            "current_insurance": "Tand 3",
+            "usage": 249,
+            "coverage": 750,
+        }, # T1.
+        {
+            "current_insurance": "Tand 2",
+            "usage": 249,
+            "coverage": 500,
+        }, # T1.
+        {
+            "current_insurance": "Tand 3",
+            "usage": 499,
+            "coverage": 750,
+        }, # T2.
+
     ]
 
     for kwargs in testcases:
