@@ -67,13 +67,14 @@ def get_insurance_coverage_from_api(customer_id):
 
 
 def suggest(usage, coverage, current_insurance, available_insurances):
+    thres = 250
     if not usage and not coverage:
         return "Geen suggestie."
 
     if not usage and coverage:
         return f"Misschien heeft u {current_insurance} niet nodig."
 
-    if usage <= coverage:
+    if usage <= coverage and (coverage - usage) <= thres:
         return f"U kunt het beste {current_insurance} blijven gebruiken."
 
     for insurance in available_insurances:
@@ -118,7 +119,7 @@ def main():
     pprint(get_additional_insurances_api())
     pprint(get_insurance_coverage_from_api(cid))
     print('---------')
-    pprint(create_suggestion(cid))
+    # pprint(create_suggestion(cid))
 
 
 if __name__ == '__main__':
